@@ -15,7 +15,7 @@
             <div class="mb-4">
             <label for="email" class="block text-sm font-medium text-gray-700">E-Mail</label>
             <input type="email" id="email" name="email" placeholder="E-Mail eingeben"
-                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 placeholder:pl-2">
+                    class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 placeholder:pl-2 input:pl-2">
             </div>
 
             <div class="mb-4">
