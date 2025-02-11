@@ -1,3 +1,24 @@
+<?php 
+$c = oci_pconnect("BIKE", "BIKE", "localhost/orcl"); 
+if (!$c) { 
+    $e = oci_error(); 
+    trigger_error('Could not connect to database: '. $e['message'], E_USER_ERROR); 
+} 
+
+// Abfrage für Kundendaten
+$s = oci_parse($c, "Select * From kunde"); 
+if (!$s) { 
+    $e = oci_error($c); 
+    trigger_error('Could not parse statement: '. $e['message'], E_USER_ERROR); 
+} 
+
+$r = oci_execute($s); 
+if (!$r) { 
+    $e = oci_error($s); 
+    trigger_error('Could not execute statement: '. $e['message'], E_USER_ERROR); 
+} 
+?>
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -22,16 +43,24 @@
                 </tr>
             </thead>
             <tbody>
-                <tr class="bg-white hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2 text-center">1</td>
-                    <td class="border border-gray-300 px-4 py-2">Max Mustermann</td>
-                    <td class="border border-gray-300 px-4 py-2">Musterstraße 1</td>
-                    <td class="border border-gray-300 px-4 py-2 text-center">12345</td>
-                    <td class="border border-gray-300 px-4 py-2">Musterstadt</td>
-                    <td class="border border-gray-300 px-4 py-2 text-center">Nein</td>
-                </tr>
+                <?php while (($row = oci_fetch_array($s, OCI_ASSOC+OCI_RETURN_NULLS)) !== false): ?>
+                    <tr class="bg-white hover:bg-gray-100">
+                        <td class="border border-gray-300 px-4 py-2 text-center"><?= htmlentities($row['NR']) ?></td>
+                        <td class="border border-gray-300 px-4 py-2"><?= htmlentities($row['NAME']) ?></td>
+                        <td class="border border-gray-300 px-4 py-2"><?= htmlentities($row['STRASSE']) ?></td>
+                        <td class="border border-gray-300 px-4 py-2"><?= htmlentities($row['PLZ']) ?></td>
+                        <td class="border border-gray-300 px-4 py-2"><?= htmlentities($row['ORT']) ?></td>
+                        <td class="border border-gray-300 px-4 py-2"><?= ($row['SPERRE'] == 'J' ? 'Ja' : 'Nein') ?></td>
+                    </tr>
+                <?php endwhile; ?>
             </tbody>
+
         </table>
     </div>
 </body>
 </html>
+
+<?php 
+oci_free_statement($s); 
+oci_close($c); 
+?>
