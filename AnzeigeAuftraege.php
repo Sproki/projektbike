@@ -1,9 +1,29 @@
+<?php
+$c = oci_pconnect("BIKE", "BIKE", "localhost/ORCL");
+if (!$c) {
+    $e = oci_error();
+    trigger_error('Could not connect to database: '. $e['message'], E_USER_ERROR);
+}
+ 
+// Abfrage für Auftragdaten
+$s = oci_parse($c, "Select * From auftrag");
+if (!$s) {
+    $e = oci_error($c);
+    trigger_error('Could not parse statement: '. $e['message'], E_USER_ERROR);
+}
+ 
+$r = oci_execute($s);
+if (!$r) {
+    $e = oci_error($s);
+    trigger_error('Could not execute statement: '. $e['message'], E_USER_ERROR);
+}
+?>
 <!DOCTYPE html>
 <html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kundentabelle</title>
+    <title>Auftragtabelle</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
@@ -20,14 +40,20 @@
                 </tr>
             </thead>
             <tbody>
+            <?php while (($row = oci_fetch_array($s, OCI_ASSOC+OCI_RETURN_NULLS)) !== false): ?>
                 <tr class="bg-white hover:bg-gray-100">
-                    <td class="border border-gray-300 px-4 py-2 text-center">1</td>
-                    <td class="border border-gray-300 px-4 py-2">25.01.2025</td>
-                    <td class="border border-gray-300 px-4 py-2">1</td>
-                    <td class="border border-gray-300 px-4 py-2 text-center">1</td>
+                    <td class="border border-gray-300 px-4 py-2 text-center"><?= htmlentities($row['AUFTRNR']) ?></td>
+                    <td class="border border-gray-300 px-4 py-2"><?= htmlentities($row['DATUM']) ?></td>
+                    <td class="border border-gray-300 px-4 py-2"><?= htmlentities($row['KUNDNR']) ?></td>
+                    <td class="border border-gray-300 px-4 py-2 text-center"><?= htmlentities($row['PERSNR']) ?></td>
                 </tr>
+            <?php endwhile; ?>
             </tbody>
         </table>
     </div>
 </body>
 </html>
+<?php
+oci_free_statement($s);
+oci_close($c);
+?>
