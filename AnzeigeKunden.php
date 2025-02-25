@@ -1,9 +1,6 @@
 <?php 
-$c = oci_pconnect("BIKE", "BIKE", "localhost/ORCL"); 
-if (!$c) { 
-    $e = oci_error(); 
-    trigger_error('Could not connect to database: '. $e['message'], E_USER_ERROR); 
-} 
+    global $c;
+    require('connection.php');
 
 // Abfrage für Kundendaten
 $s = oci_parse($c, "Select * From kunde"); 

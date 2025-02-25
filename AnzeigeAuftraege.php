@@ -1,23 +1,21 @@
 <?php
-$c = oci_pconnect("BIKE", "BIKE", "localhost/ORCL");
-if (!$c) {
-    $e = oci_error();
-    trigger_error('Could not connect to database: '. $e['message'], E_USER_ERROR);
-}
- 
-// Abfrage für Auftragdaten
-$s = oci_parse($c, "Select * From auftrag");
-if (!$s) {
-    $e = oci_error($c);
-    trigger_error('Could not parse statement: '. $e['message'], E_USER_ERROR);
-}
- 
-$r = oci_execute($s);
-if (!$r) {
-    $e = oci_error($s);
-    trigger_error('Could not execute statement: '. $e['message'], E_USER_ERROR);
-}
+    global $c;
+    require('connection.php');
+
+    // Abfrage für Auftragdaten
+    $s = oci_parse($c, "Select * From auftrag");
+    if (!$s) {
+        $e = oci_error($c);
+        trigger_error('Could not parse statement: '. $e['message'], E_USER_ERROR);
+    }
+
+    $r = oci_execute($s);
+    if (!$r) {
+        $e = oci_error($s);
+        trigger_error('Could not execute statement: '. $e['message'], E_USER_ERROR);
+    }
 ?>
+
 <!DOCTYPE html>
 <html lang="de">
 <head>
