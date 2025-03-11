@@ -39,6 +39,7 @@ CREATE TABLE Personal (
      Beurteilung CHAR(1),
      Aufgabe     CHAR(18)
 );
+
 CREATE TABLE Artikel (
      Anr         INTEGER    Constraint PK_Artikel PRIMARY KEY,
      Bezeichnung CHAR(35)   NOT NULL,
@@ -388,3 +389,107 @@ INSERT INTO Reservierung
   VALUES ( 501, 500010,   1 ); 
 INSERT INTO Reservierung 
   VALUES ( 502, 500013,   1 ); 
+
+
+-- Hinzufügen der Spalte --------------------------------------------------------------------
+ALTER TABLE Personal
+ADD Permission integer DEFAULT 1;
+
+-- Trigger ----------------------------------------------------------------------------------
+
+-- Überprüft ob beim ändern oder hinzufügen eines Mitarbeiter über 5000 Euro ist
+CREATE OR REPLACE TRIGGER check_gehalt
+BEFORE INSERT OR UPDATE ON Personal
+FOR EACH ROW
+BEGIN
+    IF :NEW.gehalt > 5000 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'Fehler: Gehalt darf maximal 5000 Euro betragen!');
+    END IF;
+END;
+/
+
+-- Permission Spalte inerhalb von 1 und 99
+CREATE OR REPLACE TRIGGER PermissionEingabe
+BEFORE INSERT OR UPDATE ON Personal
+FOR EACH ROW
+BEGIN
+    IF :NEW.Permission <= 0 OR :NEW.Permission > 99 THEN
+        RAISE_APPLICATION_ERROR(-20002, 'Fehler: Permission muss zwischen 1 und 99 liegen!');
+    END IF;
+END;
+/
+-- View ----------------------------------------------------------------------------------
+-- Erstellen aller Vorgesetzen bezogen auf Mitarbeiter
+CREATE OR REPLACE VIEW Mitarbeiter_Vorgesetzte AS
+SELECT 
+    p.Persnr AS Mitarbeiter_ID,
+    p.Name AS Mitarbeiter_Name,
+    v.Persnr AS Vorgesetzter_ID,
+    v.Name AS Vorgesetzter_Name
+FROM Personal p
+LEFT JOIN Personal v ON p.Vorgesetzt = v.Persnr;
+
+-- SELECT * FROM Mitarbeiter_Vorgesetzte;
+
+-- Prozedur ----------------------------------------------------------------------------------
+
+-- Kunden Sperren und Entsperren
+CREATE OR REPLACE PROCEDURE Kunde_SperreAendern(
+    p_KundenNr IN NUMBER
+) AS
+    p_Aktion NUMBER;
+BEGIN
+     -- Prüfen, ob der Kunde existiert
+    BEGIN
+        SELECT Sperre INTO p_Aktion FROM Kunde WHERE Nr = p_KundenNr;
+    EXCEPTION
+        WHEN NO_DATA_FOUND THEN
+            RAISE_APPLICATION_ERROR(-20002, 'Kunde nicht gefunden.');
+    END;
+    
+    -- Status umkehren
+    IF p_Aktion = 1 THEN
+        UPDATE Kunde SET Sperre = 0 WHERE Nr = p_KundenNr;
+    ELSIF p_Aktion = 0 THEN
+        UPDATE Kunde SET Sperre = 1 WHERE Nr = p_KundenNr;
+    ELSE
+        RAISE_APPLICATION_ERROR(-20001, 'Ungültiger Statuswert.');
+    END IF;
+
+    COMMIT;
+END Kunde_SperreAendern;
+
+-- Aufrufen der Prozedur in den Klammern die Kunden Nr eingeben
+-- Call Kunde_SperreAendern(...); -- 
+
+
+-- Beurteilung des Personals
+CREATE OR REPLACE PROCEDURE Beurteile_Personal (
+    p_PersonalNr IN NUMBER,
+    p_Beurteilung IN VARCHAR2
+) AS
+    v_Existiert NUMBER;
+BEGIN
+    -- Prüfen, ob das Personal existiert
+    SELECT COUNT(*) INTO v_Existiert FROM Personal WHERE Persnr = p_PersonalNr;
+
+    IF v_Existiert = 0 THEN
+        RAISE_APPLICATION_ERROR(-20003, 'Personal nicht gefunden.');
+    END IF;
+
+    -- Prüfen, ob die Beurteilung zwischen '1' und '6' liegt
+    IF NOT REGEXP_LIKE(p_Beurteilung, '^[1-6]$') THEN
+        RAISE_APPLICATION_ERROR(-20004, 'Ungültige Beurteilung. Nur Werte zwischen 1 und 6 erlaubt.');
+    END IF;
+
+    -- Beurteilung aktualisieren
+    UPDATE Personal
+    SET Beurteilung = p_Beurteilung
+    WHERE Persnr = p_PersonalNr;
+
+    COMMIT;
+END Beurteile_Personal;
+
+--In den Klammer kommt erst die Personal Nr dann die Bewertung die nur zwichen 1 und 6 sein darf
+-- Call Beurteile_Personal(1, 6);
+
