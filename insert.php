@@ -87,7 +87,7 @@ oci_close($c);
             <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-700">Auftrag speichern</button>
         </form>
 
-        <a href="index.php" class="block text-center text-blue-500 mt-4">Zurück zur Liste</a>
+        <a href="login.php" class="block text-center text-blue-500 mt-4">Zurück zur Liste</a>
     </div>
 </body>
 </html>

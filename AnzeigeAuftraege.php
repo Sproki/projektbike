@@ -1,19 +1,20 @@
 <?php
-    global $c;
-    require('connection.php');
+global $c;
+require('connection.php');
+require('navbar.php');
 
-    // Abfrage für Auftragdaten
-    $s = oci_parse($c, "Select * From auftrag");
-    if (!$s) {
-        $e = oci_error($c);
-        trigger_error('Could not parse statement: '. $e['message'], E_USER_ERROR);
-    }
+// Abfrage für Auftragsdaten
+$s = oci_parse($c, "SELECT * FROM auftrag");
+if (!$s) {
+    $e = oci_error($c);
+    trigger_error('Could not parse statement: '. $e['message'], E_USER_ERROR);
+}
 
-    $r = oci_execute($s);
-    if (!$r) {
-        $e = oci_error($s);
-        trigger_error('Could not execute statement: '. $e['message'], E_USER_ERROR);
-    }
+$r = oci_execute($s);
+if (!$r) {
+    $e = oci_error($s);
+    trigger_error('Could not execute statement: '. $e['message'], E_USER_ERROR);
+}
 ?>
 
 <!DOCTYPE html>
@@ -21,21 +22,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auftragtabelle</title>
+    <title>Aufträge anzeigen</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#1E3A8A",
+                        secondary: "#3B82F6"
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-2xl font-bold text-center mb-6">Aufträge</h2>
-       
+<body class="bg-gray-100">
+
+<main class="container mx-auto p-6 mt-6">
+    <h2 class="text-3xl font-bold text-center mb-6">Aufträge</h2>
+
+    <div class="overflow-x-auto">
         <table class="w-full border-collapse border border-gray-300">
             <thead>
-                <tr class="bg-gray-200">
-                    <th class="border border-gray-300 px-4 py-2">Nr</th>
-                    <th class="border border-gray-300 px-4 py-2">Datum</th>
-                    <th class="border border-gray-300 px-4 py-2">KundenNr</th>
-                    <th class="border border-gray-300 px-4 py-2">personalNr</th>
-                </tr>
+            <tr class="bg-gray-200">
+                <th class="border border-gray-300 px-4 py-2">Nr</th>
+                <th class="border border-gray-300 px-4 py-2">Datum</th>
+                <th class="border border-gray-300 px-4 py-2">Kunden-Nr</th>
+                <th class="border border-gray-300 px-4 py-2">Personal-Nr</th>
+            </tr>
             </thead>
             <tbody>
             <?php while (($row = oci_fetch_array($s, OCI_ASSOC+OCI_RETURN_NULLS)) !== false): ?>
@@ -49,9 +64,11 @@
             </tbody>
         </table>
     </div>
-</body>
-</html>
+</main>
+
 <?php
 oci_free_statement($s);
 oci_close($c);
 ?>
+</body>
+</html>

@@ -1,5 +1,6 @@
 <?php
 require('connection.php'); // Datenbankverbindung
+require('navbar.php');
 
 $success = "";
 $error = "";
@@ -18,7 +19,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $aufgabe = $_POST['aufgabe'] ?? '';
     $permission = $_POST['permission'] ?? '';
 
-    // Validation: Alle Pflichtfelder prüfen
     if (empty($persnr) || empty($name) || empty($gebdatum)) {
         $error = "❌ Bitte fülle alle Pflichtfelder aus.";
     } elseif (!is_numeric($persnr) || !is_numeric($plz) || !is_numeric($gehalt) || !is_numeric($permission)) {
@@ -28,13 +28,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif ($permission < 1 || $permission > 99) {
         $error = "❌ Fehler: Permission muss zwischen 1 und 99 liegen!";
     } else {
-        // SQL INSERT Statement
         $sql = "INSERT INTO Personal (PERSNR, NAME, STRASSE, PLZ, ORT, GEBDATUM, STAND, VORGESETZT, GEHALT, BEURTEILUNG, AUFGABE, PERMISSION) 
                 VALUES (:persnr, :name, :strasse, :plz, :ort, TO_DATE(:gebdatum, 'YYYY-MM-DD'), :stand, :vorgesetzt, :gehalt, :beurteilung, :aufgabe, :permission)";
-        
+
         $stmt = oci_parse($c, $sql);
 
-        // Parameter binden
         oci_bind_by_name($stmt, ":persnr", $persnr);
         oci_bind_by_name($stmt, ":name", $name);
         oci_bind_by_name($stmt, ":strasse", $strasse);
@@ -48,7 +46,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         oci_bind_by_name($stmt, ":aufgabe", $aufgabe);
         oci_bind_by_name($stmt, ":permission", $permission);
 
-        // Statement ausführen und Fehler abfangen
         if (@oci_execute($stmt) === false) {
             $e = oci_error($stmt);
             $error = "❌ Fehler: " . htmlentities($e['message']);
@@ -69,9 +66,23 @@ oci_close($c);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal hinzufügen</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: "#1E3A8A",
+                        secondary: "#3B82F6"
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-    <div class="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg">
+<body class="bg-gray-100">
+
+<main class="container mx-auto p-6 mt-6">
+    <div class="w-full max-w-lg bg-white p-6 rounded-lg shadow-lg mx-auto">
         <h2 class="text-2xl font-bold text-center mb-6">Neues Personal hinzufügen</h2>
 
         <?php if ($success): ?>
@@ -96,7 +107,8 @@ oci_close($c);
             <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-700">Speichern</button>
         </form>
 
-        <a href="index.php" class="block text-center text-blue-500 mt-4">Zurück zur Liste</a>
+        <a href="anzeigen_mitarbeiter.php" class="block text-center text-blue-500 mt-4">Zurück zur Mitarbeiterliste</a>
     </div>
+</main>
 </body>
 </html>
