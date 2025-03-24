@@ -34,7 +34,7 @@
           <a href="#" class="text-white hover:text-secondary transition">Kunden</a>
           <ul class="submenu absolute left-0 mt-2 hidden flex-col bg-white shadow-lg rounded-md overflow-hidden w-48 py-2">
             <li><a href="AnzeigeKunden.php" class="block px-4 py-2 hover:bg-secondary hover:text-white">Kunden anzeigen</a></li>
-            <li><a href="hinzufuegen_kunde.php" class="block px-4 py-2 hover:bg-secondary hover:text-white">Kunde hinzufügen</a></li>
+            <li><a href="HinzufuegenKunden.php" class="block px-4 py-2 hover:bg-secondary hover:text-white">Kunde hinzufügen</a></li>
           </ul>
         </li>
         <li class="relative group">
