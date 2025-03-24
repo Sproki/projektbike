@@ -41,7 +41,7 @@
           <a href="#" class="text-white hover:text-secondary transition">Mitarbeiter</a>
           <ul class="submenu absolute left-0 mt-2 hidden flex-col bg-white shadow-lg rounded-md overflow-hidden w-48 py-2">
             <li><a href="AnzeigenMitarbeiterVorgesetzte.php" class="block px-4 py-2 hover:bg-secondary hover:text-white">Mitarbeiter anzeigen</a></li>
-            <li><a href="hinzufuegen_mitarbeiter.php" class="block px-4 py-2 hover:bg-secondary hover:text-white">Mitarbeiter hinzufügen</a></li>
+            <li><a href="HinzufuegenPersonal.php" class="block px-4 py-2 hover:bg-secondary hover:text-white">Mitarbeiter hinzufügen</a></li>
           </ul>
         </li>
       </ul>
